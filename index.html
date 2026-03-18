@@ -1,48 +1,117 @@
-                li.innerHTML = `<a href="${file.url}" download>${file.name}</a> \n (Password protected: ${file.password ? 'Yes' : 'No'})`;
-                fileList.appendChild(li);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirelightDL - File Sharing</title>
+    <style>
+        body {
+            background-color: black;
+            color: #00ff99;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        h1 {
+            text-align: center;
+        }
+        #upload, #download, #search {
+            margin: 20px;
+            padding: 10px;
+            border: 2px solid #00ff99;
+            background-color: rgba(0, 128, 128, 0.2);
+            transition: background-color 0.3s;
+        }
+        #upload:hover, #download:hover, #search:hover {
+            background-color: rgba(0, 128, 128, 0.5);
+        }
+        #themeToggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #00ff99;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            color: black;
+            transition: color 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to FirelightDL</h1>
+    <button id="themeToggle">Toggle Theme</button>
+
+    <div id="upload">
+        <h2>Upload Files</h2>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload</button>
+    </div>
+    <div id="download">
+        <h2>Download Files</h2>
+        <select id="fileSelect"></select>
+        <button onclick="downloadFile()">Download</button>
+    </div>
+    <div id="search">
+        <h2>Search Files</h2>
+        <input type="text" id="searchInput" placeholder="Search...">
+        <button onclick="searchFiles()">Search</button>
+    </div>
+
+    <script>
+        let files = [];
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                files.push(file);
+                updateFileSelect();
+                localStorage.setItem('files', JSON.stringify(files));
+            }
+        }
+
+        function downloadFile() {
+            const select = document.getElementById('fileSelect');
+            const file = files[select.selectedIndex];
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function searchFiles() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const select = document.getElementById('fileSelect');
+            for (let i = 0; i < select.options.length; i++) {
+                const option = select.options[i];
+                option.style.display = option.text.toLowerCase().includes(input) ? 'block' : 'none';
+            }
+        }
+
+        function updateFileSelect() {
+            const select = document.getElementById('fileSelect');
+            select.innerHTML = '';
+            files.forEach(file => {
+                const option = document.createElement('option');
+                option.text = file.name;
+                select.add(option);
             });
         }
 
-        function handleFiles(files) {
-            [...files].forEach(file => {
-                const password = document.getElementById('password').value;
-                const fileObject = { name: file.name, url: URL.createObjectURL(file), password };
-                filesData.push(fileObject);
-            });
-            localStorage.setItem('filesData', JSON.stringify(filesData));
-            renderFiles();
-        }
+        document.getElementById('themeToggle').onclick = function() {
+            document.body.classList.toggle('dark-theme');
+            document.body.style.backgroundColor = document.body.style.backgroundColor === 'black' ? 'white' : 'black';
+            document.body.style.color = document.body.style.color === '#00ff99' ? 'black' : '#00ff99';
+        };
 
-        dropArea.addEventListener('dragover', e => {
-            e.preventDefault();
-        });
-
-        dropArea.addEventListener('drop', e => {
-            e.preventDefault();
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', e => {
-            handleFiles(e.target.files);
-        });
-
-        uploadBtn.addEventListener('click', () => {
-            const files = fileInput.files;
-            handleFiles(files);
-        });
-
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filteredFiles = filesData.filter(file => file.name.toLowerCase().includes(searchTerm));
-            fileList.innerHTML = '';
-            filteredFiles.forEach(file => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="${file.url}" download>${file.name}</a>`;
-                fileList.appendChild(li);
-            });
-        });
-
-        renderFiles();
+        window.onload = function() {
+            const savedFiles = JSON.parse(localStorage.getItem('files'));
+            if (savedFiles) files = savedFiles;
+            updateFileSelect();
+        };
     </script>
 </body>
 </html>
