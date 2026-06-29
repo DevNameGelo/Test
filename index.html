@@ -3,115 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FirelightDL - File Sharing</title>
+    <title>Ani Rage Beta</title>
     <style>
+        :root {
+            --bg-color: #060814;
+            --surface-color: #111424;
+            --accent-cyan: #2ce6fe;
+            --accent-pink: #ff5367;
+            --text-main: #ffffff;
+            --text-muted: #7e87a0;
+            --border-color: #1e233d;
+        }
+
         body {
-            background-color: black;
-            color: #00ff99;
-            font-family: Arial, sans-serif;
-            transition: background-color 0.5s, color 0.5s;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        h1 {
-            text-align: center;
+
+        /* Top Header Area */
+        .app-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-color);
         }
-        #upload, #download, #search {
-            margin: 20px;
-            padding: 10px;
-            border: 2px solid #00ff99;
-            background-color: rgba(0, 128, 128, 0.2);
-            transition: background-color 0.3s;
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
-        #upload:hover, #download:hover, #search:hover {
-            background-color: rgba(0, 128, 128, 0.5);
+
+        .logo span {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-left: 5px;
+            text-transform: uppercase;
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 4px;
         }
-        #themeToggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #00ff99;
+
+        /* Big Immersive Video Player Container at Top */
+        .player-section {
+            width: 100%;
+            background: #000;
+            position: relative;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.8);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Screen Ratio */
+            height: 0;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: none;
+        }
+
+        /* Settings Server Control Hub */
+        .control-hub {
+            padding: 16px;
+            background-color: var(--surface-color);
+            margin: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .control-hub label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .mirror-select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
             cursor: pointer;
-            padding: 10px;
-            color: black;
-            transition: color 0.5s;
+        }
+
+        /* Anime Meta Details */
+        .meta-container {
+            padding: 0 16px;
+            margin-bottom: 16px;
+        }
+
+        .meta-label {
+            color: var(--accent-cyan);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .anime-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+        }
+
+        .server-route {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Toggle Audio Language */
+        .toggle-container {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px;
+            margin-bottom: 24px;
+        }
+
+        .toggle-btn {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            background-color: var(--accent-pink);
+            color: #fff;
+            border-color: var(--accent-pink);
+        }
+
+        /* Vertical Interactive Episode Cards */
+        .episodes-section {
+            padding: 0 16px 100px 16px;
+            flex-grow: 1;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-title span {
+            color: var(--accent-pink);
+        }
+
+        .episode-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .episode-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .episode-card:active {
+            transform: scale(0.98);
+        }
+
+        .episode-card.active {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(90deg, rgba(44,230,254,0.05), rgba(17,20,36,1));
+        }
+
+        .episode-number {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e223b, #121526);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 16px;
+            color: var(--text-main);
+        }
+
+        .episode-card.active .episode-number {
+            background: linear-gradient(135deg, var(--accent-cyan), #00b4d8);
+            color: #000;
+        }
+
+        .episode-details {
+            flex-grow: 1;
+        }
+
+        .episode-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .episode-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Fixed Navigation Menu Footer Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-item.active {
+            color: var(--accent-cyan);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 3px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to FirelightDL</h1>
-    <button id="themeToggle">Toggle Theme</button>
 
-    <div id="upload">
-        <h2>Upload Files</h2>
-        <input type="file" id="fileInput">
-        <button onclick="uploadFile()">Upload</button>
+    <div class="app-header">
+        <div class="logo">Ani Rage<span>Beta</span></div>
     </div>
-    <div id="download">
-        <h2>Download Files</h2>
-        <select id="fileSelect"></select>
-        <button onclick="downloadFile()">Download</button>
+
+    <div class="player-section">
+        <div class="video-wrapper">
+            <iframe id="main-player" src="" allowfullscreen sandbox="allow-forms allow-pointer-handling allow-same-origin allow-scripts allow-top-navigation"></iframe>
+        </div>
     </div>
-    <div id="search">
-        <h2>Search Files</h2>
-        <input type="text" id="searchInput" placeholder="Search...">
-        <button onclick="searchFiles()">Search</button>
+
+    <div class="control-hub">
+        <label for="mirror-select">Active Stream Mirror</label>
+        <select id="mirror-select" class="mirror-select">
+            <option value="https://vidsrcme.ru">vidsrcme.ru (Live)</option>
+            <option value="https://vidsrcme.su">vidsrcme.su (Live)</option>
+            <option value="https://vidsrc-me.ru">vidsrc-me.ru (Live)</option>
+            <option value="https://vidsrc-me.su">vidsrc-me.su (Live)</option>
+            <option value="https://vidsrc-embed.ru">vidsrc-embed.ru (Live)</option>
+            <option value="https://vidsrc-embed.su">vidsrc-embed.su (Live)</option>
+            <option value="https://vsrc.su">vsrc.su (Live)</option>
+        </select>
+    </div>
+
+    <div class="meta-container">
+        <div class="meta-label">Now Playing</div>
+        <h1 id="anime-title" class="anime-title">Loading...</h1>
+        <p id="route-display" class="server-route">Server Route: --</p>
+    </div>
+
+    <div class="toggle-container">
+        <button class="toggle-btn active">Sub</button>
+        <button class="toggle-btn">Dub</button>
+    </div>
+
+    <div class="episodes-section">
+        <div class="section-title">All <span>Episodes</span></div>
+        <div class="episode-list">
+            
+            <div class="episode-card active" data-id="372058" data-type="movie" data-title="Your Name (Movie)">
+                <div class="episode-number">M</div>
+                <div class="episode-details">
+                    <div class="episode-name">Your Name</div>
+                    <div class="episode-meta">Full Length Animated Feature Movie</div>
+                </div>
+            </div>
+
+            <div class="episode-card" data-id="209867" data-type="tv" data-season="1" data-episode="1" data-title="Frieren: Beyond Journey's End">
+                <div class="episode-number">1</div>
+                <div class="episode-details">
+                    <div class="episode-name">Episode 1</div>
+                    <div class="episode-meta">Frieren Series • First Premiere Episode</div>
+                </div>
+            </div>
+
+            <div class="episode-card" data-id="94605" data-type="tv" data-season="1" data-episode="1" data-title="Demon Slayer">
+                <div class="episode-number">2</div>
+                <div class="episode-details">
+                    <div class="episode-name">Episode 1</div>
+                    <div class="episode-meta">Demon Slayer Series • First Season</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">⣿</span>
+            <span>Genres</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📺</span>
+            <span>Latest</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🔍</span>
+            <span>Search</span>
+        </a>
     </div>
 
     <script>
-        let files = [];
+        const player = document.getElementById('main-player');
+        const mirrorSelect = document.getElementById('mirror-select');
+        const animeCards = document.querySelectorAll('.episode-card');
+        const titleText = document.getElementById('anime-title');
+        const routeText = document.getElementById('route-display');
 
-        function uploadFile() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            if (file) {
-                files.push(file);
-                updateFileSelect();
-                localStorage.setItem('files', JSON.stringify(files));
+        let activeCard = document.querySelector('.episode-card.active');
+
+        function syncVideoSource() {
+            if (!activeCard) return;
+
+            const baseDomain = mirrorSelect.value;
+            const targetId = activeCard.getAttribute('data-id');
+            const type = activeCard.getAttribute('data-type');
+            const title = activeCard.getAttribute('data-title');
+
+            let generatedUrl = '';
+
+            // Using pure standard slash paths compatible across all clones & mirrors
+            if (type === 'tv') {
+                const season = activeCard.getAttribute('data-season') || '1';
+                const episode = activeCard.getAttribute('data-episode') || '1';
+                generatedUrl = `${baseDomain}/embed/tv/${targetId}/${season}/${episode}`;
+            } else {
+                generatedUrl = `${baseDomain}/embed/movie/${targetId}`;
             }
+
+            // Fire updates into the layout system
+            player.src = generatedUrl;
+            titleText.textContent = title;
+            routeText.textContent = `Server Route: ${baseDomain}`;
         }
 
-        function downloadFile() {
-            const select = document.getElementById('fileSelect');
-            const file = files[select.selectedIndex];
-            const url = URL.createObjectURL(file);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function searchFiles() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const select = document.getElementById('fileSelect');
-            for (let i = 0; i < select.options.length; i++) {
-                const option = select.options[i];
-                option.style.display = option.text.toLowerCase().includes(input) ? 'block' : 'none';
-            }
-        }
-
-        function updateFileSelect() {
-            const select = document.getElementById('fileSelect');
-            select.innerHTML = '';
-            files.forEach(file => {
-                const option = document.createElement('option');
-                option.text = file.name;
-                select.add(option);
+        // Apply handling listeners across options
+        animeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                animeCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                activeCard = card;
+                syncVideoSource();
             });
-        }
+        });
 
-        document.getElementById('themeToggle').onclick = function() {
-            document.body.classList.toggle('dark-theme');
-            document.body.style.backgroundColor = document.body.style.backgroundColor === 'black' ? 'white' : 'black';
-            document.body.style.color = document.body.style.color === '#00ff99' ? 'black' : '#00ff99';
-        };
+        mirrorSelect.addEventListener('change', syncVideoSource);
 
-        window.onload = function() {
-            const savedFiles = JSON.parse(localStorage.getItem('files'));
-            if (savedFiles) files = savedFiles;
-            updateFileSelect();
-        };
+        // Immediate application boot sequence
+        syncVideoSource();
     </script>
 </body>
 </html>
